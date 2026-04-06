@@ -1,0 +1,66 @@
+wordCountMap.java
+
+package wordcount;
+import java.io.IOException;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.mapreduce.Mapper;
+public class wordCountMap extends Mapper<LongWritable, Text, Text, IntWritable>{
+	public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException
+	{
+		String line = value.toString();
+		String[] words = line.split(" ");
+		for (String word: words) {
+			context.write(new Text(word), new IntWritable(1));
+		}
+		
+	}	
+}
+
+
+wordCountReduce.java
+
+package wordcount;
+import java.io.IOException;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.mapreduce.Reducer;
+public class wordCountReduce extends Reducer <Text, IntWritable, Text, IntWritable>{
+	public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException{
+		int sum = 0;
+		for (IntWritable val: values) {
+			sum+= val.get();
+		}
+		context.write(key, new IntWritable(sum));
+	
+	}
+}
+
+
+wordCountDriver.java
+
+package wordcount;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+public class wordCountDriver {
+	public static void main(String[] args) throws Exception{
+		Configuration c = new Configuration();
+		Job j = Job.getInstance(c, "MinMax");
+		j.setJarByClass(wordCountDriver.class);
+		j.setMapperClass(wordCountMap.class);
+		j.setReducerClass(wordCountReduce.class);
+		j.setOutputKeyClass(Text.class);
+		j.setOutputValueClass(IntWritable.class);
+		FileInputFormat.addInputPath(j, new Path(args[0]));
+		FileOutputFormat.setOutputPath(j, new Path(args[1]));
+		if (!j.waitForCompletion(true))
+			return;
+	}
+
+}
