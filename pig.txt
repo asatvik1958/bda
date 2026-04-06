@@ -1,0 +1,88 @@
+------------------------------------------------------------------------
+
+ 
+1.Write a Pig Latin scripts to demonstrate distinct, filter, foreach operator on your data. 
+------------------------------------------------------------------------
+A = LOAD '/pig1' USING PigStorage(',') AS (id:int, name:chararray, marks:int); 
+B = DISTINCT A; 
+C = FILTER A BY marks > 75; 
+D = FOREACH A GENERATE name, marks; 
+DUMP B; 
+DUMP C; 
+DUMP D;
+
+------------------------------------------------------------------------
+
+ 
+2. Implement the Pig Latin Script to find Word Count rite a Pig Latin scripts to demonstrate distinct, filter, foreach operator on your data. 
+------------------------------------------------------------------------
+
+lines = LOAD '/user/hadoop/HDFS_File.txt' AS (line:chararray); 
+words = FOREACH lines GENERATE FLATTEN(TOKENIZE(line)) AS word; 
+grouped = GROUP words BY word; 
+wordcount = FOREACH grouped GENERATE group, COUNT(words); 
+DUMP wordcount; 
+
+------------------------------------------------------------------------
+3.Implement the Pig Latin Script to find the max temp for each and every year
+------------------------------------------------------------------------
+
+records = LOAD '/home/hadoop/sample.txt' USING PigStorage(',') AS (year:chararray, temperature:int, quality:int); 
+filtered_records = FILTER records BY temperature != 9999 AND (quality == 0 OR quality == 1 OR quality == 4 OR quality == 5 OR quality == 9); 
+grouped_records = GROUP filtered_records BY year; 
+max_temp = FOREACH grouped_records GENERATE group, 
+MAX(filtered_records.temperature); 
+DUMP max_temp; 
+
+
+
+------------------------------------------------------------------------
+4. Write a Pig Latin scripts to demonstrate order by and limit operator on your data. ------------------------------------------------------------------------
+
+A = LOAD '/pig5’ USING PigStorage(',')  AS (id:int, name:chararray, marks:int); 
+B = ORDER A BY marks DESC; 
+DUMP B; 
+C = LIMIT B 2; 
+DUMP C;
+
+------------------------------------------------------------------------
+5. Write a Pig Latin scripts to demonstrate different grouping operators on your data.
+------------------------------------------------------------------------
+
+
+A = LOAD 'emp.txt' USING PigStorage(',') AS (id:int, name:chararray, dept:chararray, salary:int); 
+B = GROUP A BY dept; 
+DUMP B; 
+C = GROUP A ALL; 
+DUMP C; 
+D = FOREACH B GENERATE group AS dept, SUM(A.salary) AS total_salary; 
+DUMP D; 
+E = LOAD 'emp.txt' USING PigStorage(',') AS (id:int, name:chararray, dept:chararray, salary:int); 
+F = COGROUP A BY dept, E BY dept; 
+DUMP F;
+
+------------------------------------------------------------------------
+6. Write a Pig Latin scripts to demonstrate different filtering operators on your data.
+------------------------------------------------------------------------
+
+A = LOAD 'emp.txt' USING PigStorage(',') AS (id:int, name:chararray, dept:chararray, salary:int); 
+B = FILTER A BY salary > 30000; 
+DUMP B; 
+C = FILTER A BY dept == 'Manager' AND salary > 50000;
+DUMP C; 
+D = FILTER A BY dept == 'Clerk' OR salary > 50000; 
+DUMP D; 
+E = FILTER A BY NOT (dept == 'Clerk'); 
+DUMP E;
+
+------------------------------------------------------------------------
+7. Write a Pig Latin scripts to demonstrate Union, Split operator on your data.
+------------------------------------------------------------------------
+
+A = LOAD 'file1.txt' USING PigStorage(',') AS (id:int, name:chararray, marks:int); 
+B = LOAD 'file2.txt' USING PigStorage(',') AS (id:int, name:chararray, marks:int); 
+C = UNION A, B; 
+DUMP C; 
+SPLIT C INTO pass IF marks >= 80, fail IF marks < 80; 
+DUMP pass; 
+DUMP fail;

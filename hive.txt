@@ -1,0 +1,62 @@
+1.Write the procedure to create and alter tables with example in Hive Environment.
+
+------------------------------------------------------------------------
+
+CREATE DATABASE company;
+USE company; 
+CREATE TABLE emp (id INT, name STRING, salary FLOAT) ROW FORMAT DELIMITED FIELDS TERMINATED BY ','; 
+LOAD DATA LOCAL INPATH '/emp.txt' INTO TABLE emp; 
+SELECT * FROM emp; 
+ALTER TABLE emp ADD COLUMNS (age INT);
+ALTER TABLE emp CHANGE salary salary DOUBLE;
+DESCRIBE emp;
+ALTER TABLE emp RENAME TO employee; 
+DROP TABLE employee; 
+
+
+=------------------------------------------------------------------------
+
+2.Write the procedure to create, rename, drop tables with example in Hive Environment
+
+
+------------------------------------------------------------------------
+
+CREATE DATABASE company;
+USE company; 
+CREATE TABLE emp (id INT, name STRING, salary FLOAT) ROW FORMAT DELIMITED
+ALTER TABLE emp RENAME TO employee; 
+DROP TABLE employee; 
+
+------------------------------------------------------------------------
+
+3.Write the procedure to load the data using internal tables in Hive Environment. 
+------------------------------------------------------------------------
+
+CREATE DATABASE college;
+USE college;
+CREATE TABLE student(id INT, name STRING, dept STRING, salary INT) ROW FORMAT DELIMITED FIELDS TERMINATED  BY ',';
+LOAD DATA LOCAL INPATH '/home/cloudera/student.txt' INTO TABLE student;
+SELECT * FROM student; 
+DESCRIBE student; 
+DROP TABLE student;
+
+------------------------------------------------------------------------
+4.Create a table employee with following fields Emp_Id, Ename, Designation, Salary in Hive 
+Environment and display designation and total salary for each job. 
+
+------------------------------------------------------------------------
+
+CREATE TABLE employee ( emp_id INT, ename STRING, designation STRING, salary FLOAT ) ROW FORMAT DELIMITED FIELDS TERMINATED BY ',';
+LOAD DATA LOCAL INPATH '/home/hadoop/emp.txt' INTO TABLE employee;
+SELECT designation, SUM(salary) AS total_salary FROM employee GROUP BY designation; 
+
+------------------------------------------------------------------------
+5.Demonstrate Order by and Group by clause in Hive Environment
+------------------------------------------------------------------------
+
+
+CREATE TABLE emp (id INT, name STRING, salary FLOAT) ROW FORMAT DELIMITED FIELDS TERMINATED BY ','; 
+LOAD DATA LOCAL INPATH '/home/hadoop/emp.txt' INTO TABLE emp;
+SELECT * FROM emp ORDER BY salary; 
+SELECT * FROM emp ORDER BY salary DESC; 
+SELECT dept, SUM(salary) FROM emp GROUP BY dept;
