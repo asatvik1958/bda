@@ -1,0 +1,7 @@
+hadoop jar maxtemp.jar maxtemp.maxTempDriver
+wget https://raw.githubusercontent.com/asatvik1958/bda/main/matmul.txt
+wget https://raw.githubusercontent.com/asatvik1958/bda/main/matmul.jar
+
+hadoop jar matmul.jar matrix.matMulDriver
+wget https://raw.githubusercontent.com/asatvik1958/bda/main/maxtemp.txt
+wget https://raw.githubusercontent.com/asatvik1958/bda/main/maxtemp.jar
