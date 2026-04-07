@@ -1,0 +1,93 @@
+maxTempMap.java
+
+package maxtemp;
+import java.io.IOException;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.mapreduce.Mapper;
+public class maxTempMap extends Mapper<LongWritable, Text, Text, IntWritable> {
+	public void map(LongWritable key, Text values, Context context)throws IOException, InterruptedException {
+		String line = values.toString();
+		String year = line.substring(15,19);
+		int airtemp;
+		if (line.charAt(87) == '+')
+		{
+			airtemp = Integer.parseInt(line.substring(88,92));
+		}
+		else
+		{
+			airtemp = Integer.parseInt(line.substring(87,92));
+		}
+		String q = line.substring(92,93);
+		if (airtemp != 9999 && q.matches("[01459]"))
+		{
+			context.write(new Text(year), new IntWritable(airtemp));
+		}
+	}
+}
+
+maxTempReduce.java
+
+
+import java.io.IOException;
+import java.util.HashMap;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Reducer;
+
+public class Matreduce extends Reducer<Text, Text, Text, Text> {
+    public void reduce(Text key, Iterable<Text> values, Context context)
+            throws IOException, InterruptedException {
+
+        HashMap<Integer, Integer> mapA = new HashMap<>();
+        HashMap<Integer, Integer> mapB = new HashMap<>();
+
+        for (Text val : values) {
+            String[] data = val.toString().split(",");
+            String matrix = data[0];
+            int index = Integer.parseInt(data[1]);
+            int value = Integer.parseInt(data[2]);
+
+            if (matrix.equals("A")) {
+                mapA.put(index, value);
+            } else {
+                mapB.put(index, value);
+            }
+        }
+
+        int sum = 0;
+        for (int k : mapA.keySet()) {
+            if (mapB.containsKey(k)) {
+                sum += mapA.get(k) * mapB.get(k);
+            }
+        }
+
+        context.write(key, new Text(String.valueOf(sum)));
+    }
+}
+maxTempDriver.java
+
+package maxtemp;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+public class maxTempDriver {
+	public static void main(String[] args) throws Exception{
+		Configuration c = new Configuration();
+		Job j = Job.getInstance(c, "MinMax");
+		j.setJarByClass(maxTempDriver.class);
+		j.setMapperClass(maxTempMap.class);
+		j.setReducerClass(maxTempReduce.class);
+		j.setOutputKeyClass(Text.class);
+		j.setOutputValueClass(IntWritable.class);
+		FileInputFormat.addInputPath(j, new Path(args[0]));
+		FileOutputFormat.setOutputPath(j, new Path(args[1]));
+		if (!j.waitForCompletion(true))
+			return;
+
+	}
+}
