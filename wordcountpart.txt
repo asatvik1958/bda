@@ -78,7 +78,7 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 public class wordCountDriver {
 	public static void main(String[] args) throws Exception{
 		Configuration c = new Configuration();
-		Job j = Job.getInstance(c, "MinMax");
+		Job j = Job.getInstance(c, "wordcount");
 		j.setJarByClass(wordCountDriver.class);
 		j.setMapperClass(wordCountMap.class);
 		j.setCombinerClass(wordCountReduce.class);
