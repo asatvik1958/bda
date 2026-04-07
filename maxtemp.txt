@@ -28,43 +28,23 @@ public class maxTempMap extends Mapper<LongWritable, Text, Text, IntWritable> {
 }
 
 maxTempReduce.java
-
-
+package maxtemp;
 import java.io.IOException;
-import java.util.HashMap;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.mapreduce.Reducer;
 
-public class maxTempReduce extends Reducer<Text, Text, Text, Text> {
-    public void reduce(Text key, Iterable<Text> values, Context context)
-            throws IOException, InterruptedException {
-
-        HashMap<Integer, Integer> mapA = new HashMap<>();
-        HashMap<Integer, Integer> mapB = new HashMap<>();
-
-        for (Text val : values) {
-            String[] data = val.toString().split(",");
-            String matrix = data[0];
-            int index = Integer.parseInt(data[1]);
-            int value = Integer.parseInt(data[2]);
-
-            if (matrix.equals("A")) {
-                mapA.put(index, value);
-            } else {
-                mapB.put(index, value);
-            }
-        }
-
-        int sum = 0;
-        for (int k : mapA.keySet()) {
-            if (mapB.containsKey(k)) {
-                sum += mapA.get(k) * mapB.get(k);
-            }
-        }
-
-        context.write(key, new Text(String.valueOf(sum)));
-    }
+public class maxTempReduce extends Reducer<Text, IntWritable, Text, IntWritable>{
+	public void reduce(Text key, Iterable<IntWritable> values, Context context)
+	throws IOException, InterruptedException{
+		int maxvalue=0;
+		for (IntWritable value: values) {
+			maxvalue = Math.max(maxvalue, value.get());
+		}
+		context.write(key, new IntWritable(maxvalue));
+	}
 }
+
 maxTempDriver.java
 
 package maxtemp;
